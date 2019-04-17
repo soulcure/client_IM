@@ -479,19 +479,6 @@ public class TcpClient extends PduUtil implements Runnable {
                         }
                         buffer.flip();
 
-                        if (buffer.remaining() > PduBase.PDU_HEADER_LENGTH) {
-                            short length = buffer.getShort(2);
-                            short commandId = buffer.getShort(6);
-                            Log.d(TAG, "send package commandId:" + commandId + "  and package length:" + length);
-
-                            byte[] data = new byte[buffer.remaining()];
-                            buffer.get(data);
-                            Log.d(TAG, "tcp will send buffer:" + bytes2HexString(data));
-                            Log.d(TAG, "tcp will send buffer:" + bytes2HexString1(data));
-                            buffer.flip();
-                        }
-
-
                         if (buffer.remaining() > 0) {
                             int count;
                             try {

@@ -7,12 +7,12 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.blakequ.rsa.Base64Utils;
 import com.blakequ.rsa.RSAProvider;
 import com.google.zxing.WriterException;
 import com.youmai.HuxinSdkManager;
-import com.youmai.config.AppConfig;
 import com.youmai.db.bean.ChargerBean;
 import com.youmai.db.bean.PriceBean;
 import com.youmai.socket.PduUtil;
@@ -24,15 +24,12 @@ import com.youmai.util.SteamUtil;
 import com.youmai.util.ZXingUtil;
 
 import java.lang.ref.WeakReference;
-import java.math.BigInteger;
 import java.nio.ByteBuffer;
-import java.security.KeyFactory;
+import java.nio.charset.Charset;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
-import java.security.PublicKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
-import java.security.spec.RSAPublicKeySpec;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -127,75 +124,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         Log.v(TAG, "签名签到成功");
         HuxinSdkManager.instance().setLogin(true);
 
-        short test1 = buffer.getShort();  //1预留
-        short test2 = buffer.getShort();  //2预留
-        int matchCode = buffer.getInt();  //3报文随机数应答
-        byte loginAuth = buffer.get();  //4登入验证 0-不启用 CMD1202登入认证 1-启用 CMD1202 登入认证
-        byte encryption = buffer.get();  //5加密标志  发送 1202 报文 0-启用不加密验证  1-启用RSA 加密验证
-        byte[] rsaModulus = new byte[128];//6 RSA 公共模数
-        buffer.get(rsaModulus);
-        int rsaExponent = buffer.getInt(); //7 RSA 公密 指数
-
-        try {
-            BigInteger modulus = new BigInteger(1, rsaModulus);
-            BigInteger exponent = new BigInteger(String.valueOf(rsaExponent));
-
-            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-            RSAPublicKeySpec rsaPublicKeySpec = new RSAPublicKeySpec(modulus, exponent);
-
-            PublicKey rsaPublicKey = keyFactory.generatePublic(rsaPublicKeySpec);
-            String publicKey = Base64Utils.encode(rsaPublicKey.getEncoded());
-
-            Log.d(TAG, "RSA modulus: \n" + modulus.toString());
-            Log.d(TAG, "RSA exponent:" + String.valueOf(rsaExponent));
-            Log.d(TAG, "RSA publicKey:\n" + publicKey);
-
-            HuxinSdkManager.instance().setPublicKey(publicKey);
-
-            if (loginAuth == 1) { //1-启用 CMD1202 登入认证
-                Log.d(TAG, "服务器设置需要CMD1202 登入认证");
-                if (encryption == 1) {
-                    HuxinSdkManager.instance().setRSA(true);
-                } else {
-                    HuxinSdkManager.instance().setRSA(false);
-                }
-
-                //（CMD=1202）充电桩密码登入报文
-                HuxinSdkManager.instance().chargerLoginByEncrypt(new ReceiveListener() {
-                    @Override
-                    public void OnRec(ByteBuffer buffer) {
-                        short test1 = buffer.getShort();//1 预留
-                        short test2 = buffer.getShort(); //2 预留
-                        int typeAES = buffer.getInt();  // 3 AES密钥标志  (CMD=105)0没有开启加密  1后续使用AES加密 2后续使用服务器指定AES密钥  3后续不加密
-                        byte[] keyAES = new byte[24];  // 4  AES加密密钥
-                        buffer.get(keyAES);
-
-                        Log.d(TAG, "typeAES:" + typeAES);
-                        if (typeAES == 1) {  //1后续使用AES加密 使用客户端AES密钥
-                            Log.d(TAG, "server set AES encrypt and key from client");
-                            HuxinSdkManager.instance().setAES(true);
-                        } else if (typeAES == 2) {//2后续使用服务器指定AES密钥
-                            Log.d(TAG, "server set AES encrypt and key from server and keyAES:" + PduUtil.bytes2HexString(keyAES));
-                            HuxinSdkManager.instance().setAES(true);
-                            AESCrypt.instance().setKeyCode(keyAES);
-                        } else {
-                            Log.d(TAG, "server set not AES encrypt");
-                            HuxinSdkManager.instance().setAES(false);
-                        }
-
-                        authSuccess();
-
-                    }
-                });
-            } else { //0-不启用 CMD1202 登入认证
-                Log.d(TAG, "服务器设置不需要CMD1202 登入认证");
-                authSuccess();
-            }
-
-        } catch (Exception e) {
-            Log.e(TAG, e.getMessage());
-        }
-
+        byte[] test = new byte[buffer.remaining()];
+        buffer.get(test);
+        Toast.makeText(mContext, new String(test, Charset.forName("UTF-8")), Toast.LENGTH_SHORT).show();
     }
 
 

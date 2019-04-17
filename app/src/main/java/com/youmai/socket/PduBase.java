@@ -17,7 +17,7 @@ public class PduBase {
      * index 0. pos:[0-2) 帧头
      * the start flag of a pdu.
      */
-    public static final short starFlag = (short) 0xFFAA;  //使用小端数据 0xAAFF 反转
+    public static final short starFlag = 0x1234;  //使用小端数据
 
 
     /****************************************************

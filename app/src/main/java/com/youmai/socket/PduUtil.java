@@ -34,11 +34,9 @@ public abstract class PduUtil {
             return -1;
         }
 
-
         if (buffer.limit() >= PduBase.PDU_HEADER_LENGTH) {
             //has full header
-            short totalLength = buffer.getShort(PduBase.PDU_BODY_LENGTH_INDEX);
-
+            int totalLength = PduBase.PDU_HEADER_LENGTH + buffer.getInt(PduBase.PDU_BODY_LENGTH_INDEX);
             if (totalLength <= buffer.limit()) {
                 //has a full pack.
                 byte[] packByte = new byte[totalLength];
@@ -76,7 +74,7 @@ public abstract class PduUtil {
         buffer.put(bytes);//准备从缓冲区中读取数据
         buffer.flip();
 
-        Log.d(TAG, "tcp rec package commandId:" + buffer.getInt(6));
+        Log.d(TAG, "tcp rec package commandId:" + buffer.getShort(2));
         byte[] data = new byte[buffer.remaining()];
         buffer.get(data);
         Log.d(TAG, "tcp rec buffer:" + bytes2HexString(data));
@@ -89,12 +87,11 @@ public abstract class PduUtil {
             units.length = length;
             units.commandId = commandId;
 
-            int paramsLength = length - PduBase.PDU_HEADER_LENGTH;
-            if (paramsLength > 0) {
-                units.params = new byte[paramsLength];
+            Log.d(TAG, "tcp rec package params Length:" + length);
+
+            if (length > 0) {
+                units.params = new byte[length];
                 buffer.get(units.params);
-            } else {
-                Log.e(TAG, "tcp rec package paramsLength:" + paramsLength);
             }
 
             return units;

@@ -27,6 +27,7 @@ import com.youmai.util.BCDUtil;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -628,29 +629,14 @@ public class HuxinSdkManager {
         short commandId = ProtoCommandId.CMD_LOGIN_REQ;
         short rspId = ProtoCommandId.CMD_LOGIN_RSP;
 
-        int version = ProtoCommandId.getSoftVersion();
-        short protoVer = ProtoCommandId.getProtoVersion();
-
         ByteBuffer buffer = ProtoCommandId.sendBuffer();
-        buffer.putInt(version); //5充电桩软件版本
-        buffer.putShort((short) 0);  //6充电桩类型 预留
-        buffer.putInt(1001);  //7充电桩启动次数  终端每次启动，计数保存
-        buffer.put((byte) 2);  //8数据上传模式 1:应答模式 2:主动上报模式
-        buffer.putShort((short) 10);  //9充电桩签到时间单位分钟
 
-        buffer.put((byte) 0);  //10运行内部变量 O:正常工作模式 1:IAP模式
-        buffer.put((byte) 1);  //11充电枪个数
-        buffer.put((byte) 5);  //12心跳上报周期
-        buffer.put((byte) 1);  //13心跳包检测超时次数
-        buffer.putInt(8888);  //14充电记录数量
-        buffer.putLong(System.currentTimeMillis());  //15当前充电桩系统时间
-        buffer.putLong(0);  //16预留
-        buffer.putLong(0);  //17预留
-        buffer.putLong(0);  //18预留
-        buffer.putInt(new Random().nextInt());  //19桩生成随机数
-        buffer.putShort(protoVer);  //20桩后台通信协议版本
+        byte[] codeBytes = "im message test".getBytes(Charset.forName("UTF-8"));
+        buffer.putInt(codeBytes.length);
+        buffer.put(codeBytes);
 
-        sendProto(commandId, buffer, rspId, callback);
+        //sendProto(commandId, buffer, rspId, callback);
+        sendProto(commandId, buffer, commandId, callback);
     }
 
     /**

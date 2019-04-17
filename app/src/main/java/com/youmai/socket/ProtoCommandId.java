@@ -106,11 +106,6 @@ public class ProtoCommandId {
     public static ByteBuffer sendBuffer() {
         ByteBuffer buffer = ByteBuffer.allocate(AppConfig.SEND_BUFFER_SIZE);
         buffer.order(ByteOrder.LITTLE_ENDIAN);
-
-        buffer.putShort((short) 0);  // 1预留
-        buffer.putShort((short) 0);  //2预留
-        buffer.put(getMatchCode());  //3充电桩编码
-
         return buffer;
     }
 
