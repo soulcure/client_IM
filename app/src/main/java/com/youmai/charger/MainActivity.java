@@ -4,6 +4,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
 import android.support.v7.widget.RecyclerView;
@@ -93,7 +94,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         switch (id) {
             case R.id.btn_send:
                 String msg = et_send.getText().toString();
-                sendText(msg);
+                if (!TextUtils.isEmpty(msg)) {
+                    sendText(msg);
+                }
                 break;
         }
     }
