@@ -623,16 +623,16 @@ public class HuxinSdkManager {
      * （CMD=106）充电桩签到信息上报
      * 充电桩鉴权登录
      *
+     * @param msg
      * @param callback
      */
-    public void chargerAuth(ReceiveListener callback) {
+    public void sendText(String msg, ReceiveListener callback) {
         short commandId = ProtoCommandId.CMD_LOGIN_REQ;
         short rspId = ProtoCommandId.CMD_LOGIN_RSP;
 
         ByteBuffer buffer = ProtoCommandId.sendBuffer();
 
-        byte[] codeBytes = "im message test".getBytes(Charset.forName("UTF-8"));
-        buffer.putInt(codeBytes.length);
+        byte[] codeBytes = msg.getBytes(Charset.forName("UTF-8"));
         buffer.put(codeBytes);
 
         //sendProto(commandId, buffer, rspId, callback);
